@@ -1,0 +1,11 @@
+main 
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.item:hover
+{
+    cursor: pointer;
+    opacity: 0.8;
+}
