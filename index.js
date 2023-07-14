@@ -2,14 +2,18 @@
 //Purpose: Creates a fixed image element and places it into the body of index.html
 //Arguments: elementID = string id name that is also the relative link to the file, assuming it is in the assets folder, 
 //           xCoord = the left offset of the image, yCoord = the bottom offset of the image 
-function addImage(elementID, xCoord, yCoord, fileExtension)
+//           fileExtension = file type string,  isNotBackground = boolean deciding if an id should be added
+function addImage(elementID, xCoord, yCoord, fileExtension, isNotBackground)
 {
     elementImage = document.createElement('img');
     elementImage.src =  "/assets/" + elementID + fileExtension;
     elementImage.style.position = 'fixed';
     elementImage.style.left = xCoord + "px";
     elementImage.style.bottom = yCoord + "px";
-    //elementImage.id = elementID;
+    if (isNotBackground)
+    {
+        elementImage.id = elementID;
+    }
     document.body.append(elementImage);    
 }
 //Purpose: Add an event listener to remove an item from the screen upon double clicking (by changing display to none)
@@ -28,21 +32,27 @@ function pickupItem(imageSrcID)
 function generateBackground(skyImageSrc, groundImageSrc, dimensions)
 {
     var heightRepeat = window.innerHeight/dimensions;
-    var skyToGroundSwitch = Math.ceil(heightRepeat/4);
-    for (var i=0; i< heightRepeat; i++ )
+    var skyToGroundSwitch = Math.ceil((heightRepeat/3) * 2) ;
+    var widthRepeat = window.innerWidth/dimensions;
+    for (var j=0; j< heightRepeat; j++)
+    {
+        var yCoord = j *dimensions
+        for (let i=0; i< widthRepeat; i++)
         {
-            var xCoord = j * dimensions;
-            var yCoord = i * dimensions;
-            if ( i> skyToGroundSwitch )
+            let xCoord = i * dimensions;
+            console.log(xCoord);
+            console.log(yCoord)
+            if (j < skyToGroundSwitch)
             {
-                var widthRepeat = window.innerWidth/dimensions;
-                for (let j=0; j < widthRepeat; j++)
-                {
-                    addImage('sky', xCoord, yCoord, '.png')
-                }
+                addImage('grass', xCoord, yCoord, '.png', false)
             }
-
+            else
+            {
+                addImage('sky', xCoord, yCoord, '.png', false)
+            }
         }
+    }
+
 
 }
 generateBackground('sky', 'grass', 100);
@@ -67,12 +77,12 @@ var interactableImageObject =
 for (let i =0; i< Object.keys(settingImageObject).length; i++)
 {
     let name = Object.keys(settingImageObject)[i];
-    addImage(name, settingImageObject[name][0][0],settingImageObject[name][0][1], settingImageObject[name][1]);
+    addImage(name, settingImageObject[name][0][0],settingImageObject[name][0][1], settingImageObject[name][1], true);
 }
 
 for (let i =0; i< Object.keys(interactableImageObject).length; i++)
 {
     let name = Object.keys(interactableImageObject)[i];
-    addImage(name, interactableImageObject[name][0][0],interactableImageObject[name][0][1], interactableImageObject[name][1]);
+    addImage(name, interactableImageObject[name][0][0],interactableImageObject[name][0][1], interactableImageObject[name][1], true);
     pickupItem(name);
 }
