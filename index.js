@@ -161,57 +161,102 @@ for (let i =0; i< Object.keys(interactableImageObject).length; i++)
 }
 
 //Allowing a character to move
+const character = document.getElementById('green-character');
+function move(element) {
+    element.style.position = 'fixed'
 
-function registerArrowKey(event)
-{
-    var character = document.getElementById(characterID);
-    var keyClicked = event.which || event.keyCode //depends on browser
-    switch (keyClicked)
-    {
-        case 37:
-            moveLeft(character);
-            character.src ='/assets/green-character/west.gif'
-            break;
-        case 38:
-            moveUp(character);
-            character.src = '/assets/green-character/north.gif'
-            break;
-        case 39:
-            moveRight(character);
-            character.src = '/assets/green-character/east.gif'
-            break;
-        case 40:
-            moveDown(character);
-            character.src = '/assets/green-character/south.gif'
-            break;
-        case 69:
-            let inventory = document.getElementById('inventory');
-            inventory.classList.toggle('shown');
-            if (inventory.classList.contains('shown'))
-            {
-                inventory.style.display = "";
+    function moveToCoordinates(left, bottom) {
+        element.style.left = left + 'px'
+        element.style.bottom = bottom + 'px'
+    }
+
+    function moveWithArrowKeys(left, bottom, callback){
+        let direction = null;
+        let x = left;
+        let y = bottom;
+
+        element.style.left = x + 'px'
+        element.style.bottom = y + 'px'
+        
+        function moveCharacter(){ 
+            if(direction === 'west'){
+                x-=1
             }
-            else
-            {
-                inventory.style.display = "none";
+            if(direction === 'north'){
+                y+=1
             }
+            if(direction === 'east'){
+                x+=1
+            }
+            if(direction === 'south'){
+                y-=1
+            }
+            element.style.left = x + 'px'
+            element.style.bottom = y + 'px'
+        }
+        
+        setInterval(moveCharacter, 1)
+        
+        document.addEventListener('keydown', function(e){
+            if(e.repeat) return;
+        
+            if(e.key === 'ArrowLeft'){
+                direction = 'west'
+            }
+            if(e.key === 'ArrowUp'){
+                direction = 'north'
+            }
+            if(e.key === 'ArrowRight'){
+                direction = 'east'
+            }
+            if(e.key === 'ArrowDown'){
+                direction = 'south'
+            }
+            if(e.key == 'e')
+            {
+                let inventory = document.getElementById('inventory');
+                inventory.classList.toggle('shown');
+                if (inventory.classList.contains('shown'))
+                {
+                    inventory.style.display = "";
+                }
+                else
+                {
+                    inventory.style.display = "none";
+                }
+            }
+            callback(direction)
+        })
+        
+        document.addEventListener('keyup', function(e){
+            direction = null
+            callback(direction)
+        })
+    }
+
+    return {
+        to: moveToCoordinates,
+        withArrowKeys: moveWithArrowKeys
     }
 }
-function moveLeft(character) 
-{
-    character.style.left = parseInt(character.style.left) - 5 + "px";
-}
-function moveUp(character) 
-{
-    character.style.bottom = parseInt(character.style.bottom) + 5 + "px";
-}
-function moveRight(character) 
-{
-    character.style.left = parseInt(character.style.left) + 5 + "px";
-}
-function moveDown(character) 
-{
-    character.style.bottom = parseInt(character.style.bottom) - 5 + "px";
+
+function handleDirectionChange(direction){
+    if(direction === null){
+        character.src = `assets/green-character/static.gif`
+    }
+    if(direction === 'west'){
+        character.src = `assets/green-character/west.gif`
+    }
+    if(direction === 'north'){
+        character.src = `assets/green-character/north.gif`
+    }
+    if(direction === 'east'){
+        character.src = `assets/green-character/east.gif`
+    }
+    if(direction === 'south'){
+        character.src = `assets/green-character/south.gif`
+    }
 }
 
-alert("Type 'e' to open the inventory");
+move(character).withArrowKeys(100, 250, handleDirectionChange)
+
