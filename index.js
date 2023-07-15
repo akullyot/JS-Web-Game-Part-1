@@ -78,8 +78,8 @@ function pickupItem(imageSrcID)
                     else
                     {
                         inventorySlots[i].classList.toggle('filled');
-                        item.width = 40;
-                        item.height = 40;
+                        item.style.width = '40px';
+                        item.style.height = '40px';
                         item.style.position = "";
                         item.style.left = "0px"
                         item.style.bottom = "0px";
@@ -98,12 +98,14 @@ function pickupItem(imageSrcID)
 function dropItem(imageSrcID)
 {
     var character = document.getElementById('green-character');
-    var bottom = character.getBoundingClientRect().bottom; // TODO there is a problem here
-    var left = character.getBoundingClientRect().left;
+    var bottom = character.style.bottom; // TODO there is a problem here
+    var left = character.style.left;
     var item = document.getElementById(imageSrcID);
     item.parentNode.classList.toggle('filled');
-    item.style.left = left + "px";
-    item.style.bottom = bottom + "px"; 
+    item.style.left = left;
+    item.style.bottom = bottom; 
+    item.style.width = 'auto';
+    item.style.height = 'auto';
     item.style.position = "fixed";
     item.classList.toggle("inInventory");
     document.getElementsByTagName('main')[0].append(item);
@@ -212,4 +214,4 @@ function moveDown(character)
     character.style.bottom = parseInt(character.style.bottom) - 5 + "px";
 }
 
-
+alert("Type 'e' to open the inventory");
