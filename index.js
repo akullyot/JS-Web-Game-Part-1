@@ -50,8 +50,6 @@ function generateBackground(skyImageSrc, groundImageSrc, dimensions)
             }
         }
     }
-
-
 }
 //!SECTION functions pertaining to dynamics
 //Purpose: Add an event listener to remove an item from the screen upon double clicking (by changing display to none)
@@ -115,52 +113,9 @@ function unWalkableItem(imageSrcID)
     var unWalkable = document.getElementById(imageSrcID);
     unWalkable.classList = "unWalkable";
 }
-//Adding to the body
-
-generateBackground('sky', 'grass', 100);
-//Definition: Object that holds all images that are static background pieces
-//Key: Value => ImageId : [[xCoord, yCoord], FileExtension]
-var settingImageObject = 
-{
-    'tree'            : [[200, 300], '.png', true],
-    'pillar'          : [[350, 100], '.png', true],
-    'crate'           : [[500, 425], '.png', true],
-    'well'            : [[300, 425], '.png', true],
-    'pine-tree'       : [[450, 350], '.png', true]
-}
-//Definition: Object that holds all images that are clickable items
-//Key: Value => ImageId : [[xCoord, yCoord], FileExtension]
-var interactableImageObject =
-{
-    'shield' : [[165, 185], '.png', true],
-    'staff'  : [[600, 100], '.png', true],
-    'sword'  : [[700, 300], '.png', true]
-}
-//Definition: Object (because I expect multiple to come up), that holds our moveable sprite
-//Key:Value => ImageID : [[xCoord, yCoord], fileExtension]
-var CharacterSprite =
-{
-    'green-character' : [[100, 100], '.gif', true]
-}
-var characterID = Object.keys(CharacterSprite)[0];
-
-addImage(characterID, CharacterSprite[characterID][0][0], CharacterSprite[characterID][0][1],  CharacterSprite[characterID][1],  CharacterSprite[characterID][2]);
-
-for (let i =0; i< Object.keys(settingImageObject).length; i++)
-{
-    let name = Object.keys(settingImageObject)[i];
-    addImage(name, settingImageObject[name][0][0],settingImageObject[name][0][1], settingImageObject[name][1], settingImageObject[name][2] );
-    unWalkableItem(name);
-}
-
-for (let i =0; i< Object.keys(interactableImageObject).length; i++)
-{
-    let name = Object.keys(interactableImageObject)[i];
-    addImage(name, interactableImageObject[name][0][0],interactableImageObject[name][0][1], interactableImageObject[name][1], interactableImageObject[name][2]);
-    pickupItem(name);
-}
-
-//Allowing a character to move
+//Purpose: Allows our sprite to move via a selected interval that ends on keyup
+// Arguments: argument requires our character that we want to move to be globally defined
+//Note: also includes our open inventory key mapping
 const character = document.getElementById('green-character');
 function move(element) {
     element.style.position = 'fixed'
@@ -169,8 +124,7 @@ function move(element) {
         element.style.left = left + 'px'
         element.style.bottom = bottom + 'px'
     }
-
-    function moveWithArrowKeys(left, bottom, callback){
+    function RegisterArrowKeys(left, bottom, callback){
         let direction = null;
         let x = left;
         let y = bottom;
@@ -236,10 +190,11 @@ function move(element) {
 
     return {
         to: moveToCoordinates,
-        withArrowKeys: moveWithArrowKeys
+        withArrowKeys: RegisterArrowKeys
     }
 }
-
+//Purpose: Changes the gif of our character during a key event to walk in the proper direction (a callback of our move function)
+//Arguments: the direction the character is moving
 function handleDirectionChange(direction){
     if(direction === null){
         character.src = `assets/green-character/static.gif`
@@ -256,6 +211,51 @@ function handleDirectionChange(direction){
     if(direction === 'south'){
         character.src = `assets/green-character/south.gif`
     }
+}
+
+//////////////////////////////////////////////////////////////Execution////////////////////////////////////////////////////////////
+
+generateBackground('sky', 'grass', 100);
+//Definition: Object that holds all images that are static background pieces
+//Key: Value => ImageId : [[xCoord, yCoord], FileExtension, isNotBackground]
+var settingImageObject = 
+{
+    'tree'            : [[200, 300], '.png', true],
+    'pillar'          : [[350, 100], '.png', true],
+    'crate'           : [[500, 425], '.png', true],
+    'well'            : [[300, 425], '.png', true],
+    'pine-tree'       : [[450, 350], '.png', true]
+}
+//Definition: Object that holds all images that are clickable items
+//Key: Value => ImageId : [[xCoord, yCoord], FileExtension, isNotBackground]
+var interactableImageObject =
+{
+    'shield' : [[165, 185], '.png', true],
+    'staff'  : [[600, 100], '.png', true],
+    'sword'  : [[700, 300], '.png', true]
+}
+//Definition: Object (because I expect multiple to come up), that holds our moveable sprite
+//Key:Value => ImageID : [[xCoord, yCoord], fileExtension, isNotBackground]
+var CharacterSprite =
+{
+    'green-character' : [[100, 100], '.gif', true]
+}
+var characterID = Object.keys(CharacterSprite)[0];
+
+addImage(characterID, CharacterSprite[characterID][0][0], CharacterSprite[characterID][0][1],  CharacterSprite[characterID][1],  CharacterSprite[characterID][2]);
+
+for (let i =0; i< Object.keys(settingImageObject).length; i++)
+{
+    let name = Object.keys(settingImageObject)[i];
+    addImage(name, settingImageObject[name][0][0],settingImageObject[name][0][1], settingImageObject[name][1], settingImageObject[name][2] );
+    unWalkableItem(name);
+}
+
+for (let i =0; i< Object.keys(interactableImageObject).length; i++)
+{
+    let name = Object.keys(interactableImageObject)[i];
+    addImage(name, interactableImageObject[name][0][0],interactableImageObject[name][0][1], interactableImageObject[name][1], interactableImageObject[name][2]);
+    pickupItem(name);
 }
 
 move(character).withArrowKeys(100, 250, handleDirectionChange);
