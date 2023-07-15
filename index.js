@@ -61,32 +61,43 @@ function pickupItem(imageSrcID)
     var item = document.getElementById(imageSrcID);
     item.classList = "item";
     item.addEventListener('dblclick', () => {
-        let inventorySlots = document.querySelectorAll("#inventory-list li");
-        let counter = 0;
-            for (let i = 0; i< inventorySlots.length; i++)
-            {
-                if(inventorySlots[i].classList.value.includes('filled'))
-                {
-                    counter++;
-                }
-                else
-                {
-                    inventorySlots[i].classList.toggle('filled');
-                    item.width = 40;
-                    item.height = 40;
-                    item.style.position = "";
-                    item.style.left = "0px"
-                    item.style.bottom = "0px";
-                    inventorySlots[i].append(item);
-                    break;
-                }
-            }
-        if (counter == inventorySlots.length)
+        if (item.classList.value.includes('inInventory'))
         {
-            alert('inventory is full');
+            dropItem(imageSrcID);
         }
-
+        else
+        {
+            let inventorySlots = document.querySelectorAll("#inventory-list li");
+            let counter = 0;
+                for (let i = 0; i< inventorySlots.length; i++)
+                {
+                    if(inventorySlots[i].classList.value.includes('filled'))
+                    {
+                        counter++;
+                    }
+                    else
+                    {
+                        inventorySlots[i].classList.toggle('filled');
+                        item.width = 40;
+                        item.height = 40;
+                        item.style.position = "";
+                        item.style.left = "0px"
+                        item.style.bottom = "0px";
+                        item.classList.toggle('inInventory');
+                        inventorySlots[i].append(item);
+                        break;
+                    }
+                }
+            if (counter == inventorySlots.length)
+            {
+                alert('inventory is full');
+            }
+        }
     })
+}
+function dropItem(imageSrcID)
+{
+    
 }
 function unWalkableItem(imageSrcID)
 {   
