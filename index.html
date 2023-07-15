@@ -2,9 +2,41 @@
     <head>
         <link rel="stylesheet" href="assets/style.css">
     </head>
-    <body>
+    <body onkeydown="registerArrowKey(event)">
         <main>
+            <div id = "background">
+            </div>
+            <div id = "inventory" class="showhide" style = "display: none;">
+                <header> MY INVENTORY </header>
+                <div id = "sprite-and-items">
+                    <img id = "inventorySprite" src= "/assets/green-character.gif">
+                    <div>
+                        <ul id = 'inventory-list'>
+                            <div>
+                                <li id = "inv0"></li>
+                                <li id = "inv4"></li>
+                                <li id = "inv8"></li>
+                            </div>
+                            <div>
+                                <li id = "inv1"></li>
+                                <li id = "inv5"></li>
+                                <li id = "inv9"></li>
+                            </div>
+                            <div>
+                                <li id = 'inv2'></li>
+                                <li id = "inv6"></li>
+                                <li id = "inv10" ></li>
+                            </div>
+                            <div>
+                                <li id = 'inv3'></li>
+                                <li id = "inv7"></li>
+                                <li id = "inv11" ></li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
 
+            </div>
         </main>
         <script src="./index.js"></script>
     </body>
