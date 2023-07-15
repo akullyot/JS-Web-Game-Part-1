@@ -258,5 +258,6 @@ function handleDirectionChange(direction){
     }
 }
 
-move(character).withArrowKeys(100, 250, handleDirectionChange)
+move(character).withArrowKeys(100, 250, handleDirectionChange);
+alert('press e to open the inventory, and double click to pickup or drop items.');
 
