@@ -116,15 +116,15 @@ function unWalkableItem(imageSrcID)
 //Purpose: Allows our sprite to move via a selected interval that ends on keyup
 // Arguments: argument requires our character that we want to move to be globally defined
 //Note: also includes our open inventory key mapping
-const character = document.getElementById('green-character');
 function move(element) {
     element.style.position = 'fixed'
-
-    function moveToCoordinates(left, bottom) {
+    function moveToCoordinates(left, bottom) 
+    {
         element.style.left = left + 'px'
         element.style.bottom = bottom + 'px'
     }
-    function RegisterArrowKeys(left, bottom, callback){
+    function RegisterArrowKeys(left, bottom, callback)
+    {
         let direction = null;
         let x = left;
         let y = bottom;
@@ -132,7 +132,8 @@ function move(element) {
         element.style.left = x + 'px'
         element.style.bottom = y + 'px'
         
-        function moveCharacter(){ 
+        function moveCharacter()
+        { 
             if(direction === 'west'){
                 x-=1
             }
@@ -148,10 +149,9 @@ function move(element) {
             element.style.left = x + 'px'
             element.style.bottom = y + 'px'
         }
-        
         setInterval(moveCharacter, 1)
-        
-        document.addEventListener('keydown', function(e){
+        document.addEventListener('keydown', function(e)
+        {
             if(e.repeat) return;
         
             if(e.key === 'ArrowLeft'){
@@ -257,7 +257,7 @@ for (let i =0; i< Object.keys(interactableImageObject).length; i++)
     addImage(name, interactableImageObject[name][0][0],interactableImageObject[name][0][1], interactableImageObject[name][1], interactableImageObject[name][2]);
     pickupItem(name);
 }
-
+const character = document.getElementById('green-character');
 move(character).withArrowKeys(100, 250, handleDirectionChange);
 alert('press e to open the inventory, and double click to pickup or drop items.');
 
