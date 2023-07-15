@@ -97,7 +97,16 @@ function pickupItem(imageSrcID)
 }
 function dropItem(imageSrcID)
 {
-    
+    var character = document.getElementById('green-character');
+    var bottom = character.getBoundingClientRect().bottom; // TODO there is a problem here
+    var left = character.getBoundingClientRect().left;
+    var item = document.getElementById(imageSrcID);
+    item.parentNode.classList.toggle('filled');
+    item.style.left = left + "px";
+    item.style.bottom = bottom + "px"; 
+    item.style.position = "fixed";
+    item.classList.toggle("inInventory");
+    document.getElementsByTagName('main')[0].append(item);
 }
 function unWalkableItem(imageSrcID)
 {   
@@ -148,7 +157,6 @@ for (let i =0; i< Object.keys(interactableImageObject).length; i++)
     addImage(name, interactableImageObject[name][0][0],interactableImageObject[name][0][1], interactableImageObject[name][1], interactableImageObject[name][2]);
     pickupItem(name);
 }
-
 
 //Allowing a character to move
 
