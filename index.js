@@ -28,11 +28,13 @@ function addImage(elementID, xCoord, yCoord, fileExtension, isNotBackground)
 }
 //Purpose: Create a background with 1/4 of the background being a sky, and the rest being a green background
 //Arguments: skyImageSrc = file extension, assuming assets folder, groundImageSrc = file extension, assuming assets folder
+//            dimensions: dimension of the square image in pixels, proportion: 1/proportion, where this ratio defines the sky to ground switch
     //Notes: function assumes the images are coming in as square images
-function generateBackground(skyImageSrc, groundImageSrc, dimensions)
+function generateBackground(skyImageSrc, groundImageSrc, dimensions, proportion)
 {
     var heightRepeat = window.innerHeight/dimensions;
-    var skyToGroundSwitch = Math.ceil((heightRepeat/3) * 2) ;
+    var skyToGroundSwitch = Math.ceil((heightRepeat/proportion) * (proportion - 1));
+    var skyToGroundSwitchLocation = window.innerHeight/proportion * (proportion -1)
     var widthRepeat = window.innerWidth/dimensions;
     for (var j=0; j< heightRepeat; j++)
     {
@@ -50,6 +52,7 @@ function generateBackground(skyImageSrc, groundImageSrc, dimensions)
             }
         }
     }
+    return skyToGroundSwitchLocation;
 }
 //!SECTION functions pertaining to dynamics
 //Purpose: Add an event listener to remove an item from the screen upon double clicking (by changing display to none)
@@ -212,10 +215,106 @@ function handleDirectionChange(direction){
         character.src = `assets/green-character/south.gif`
     }
 }
+//Purpose: Instantiate a promised, NPC Object and loop its walking
+// Parametres: starting X and Y coordinate for the sprite, and the number of pixels it moves per move interval
+function newNonPlayableCharacter(x, y, speed) {
+    let element = NPC
+    element.style.zIndex = 1;
+    let direction = null;
+    function moveCharacter() {
+        if (direction === 'west') {
+            if (x > 0)
+            {
+                x -= speed
+            }
+        }
+        if (direction === 'north') {
+            if (y < skyToGroundSwitchLocation)
+            {
+                y += speed
+            }
+        }
+        if (direction === 'east') {
+            if (x < window.innerWidth) //TODO: there is a problem here im not sure what
+            {
+                x += speed
+            }
+        }
+        if (direction === 'south') {
+            if (y > 0)
+            {
+                y -= speed
+            }
+        }
+        element.style.left = x + 'px'
+        element.style.bottom = y + 'px'
+    }
+
+    setInterval(moveCharacter, 1)
+
+    function walkEast(time) {
+        return new Promise(resolve => {
+            direction = 'east'
+            element.src = `./assets/red-character/east.gif`
+            setTimeout(() => {
+                stop()
+                resolve()
+            }, time)
+        })
+    }
+
+    function walkNorth(time) {
+        return new Promise(resolve => {
+            direction = 'north'
+            element.src = `./assets/red-character/north.gif`
+            setTimeout(() => {
+                stop()
+                resolve() //returns a promise object for us
+            }, time)
+        })
+    }
+
+    function walkWest(time) {
+        return new Promise(resolve => {
+            direction = 'west'
+            element.src = `./assets/red-character/west.gif`
+            setTimeout(() => {
+                stop()
+                resolve()
+            }, time)
+        })
+    }
+
+    function walkSouth(time) {
+        return new Promise(resolve => {
+            direction = 'south'
+            element.src = `./assets/red-character/south.gif`
+            setTimeout(() => {
+                stop()
+                resolve()
+            }, time)
+        })
+    }
+
+    function stop() {
+        direction = null
+        element.src = `./assets/red-character/static.gif`
+    }
+
+    return {
+        element: element,
+        walkWest: walkWest,
+        walkNorth: walkNorth,
+        walkEast: walkEast,
+        walkSouth: walkSouth,
+        stop: stop
+    }
+}
 
 //////////////////////////////////////////////////////////////Execution////////////////////////////////////////////////////////////
 
-generateBackground('sky', 'grass', 100);
+const skyToGroundSwitchLocation=  generateBackground('sky', 'grass', 100, 3);
+
 //Definition: Object that holds all images that are static background pieces
 //Key: Value => ImageId : [[xCoord, yCoord], FileExtension, isNotBackground]
 var settingImageObject = 
@@ -238,11 +337,16 @@ var interactableImageObject =
 //Key:Value => ImageID : [[xCoord, yCoord], fileExtension, isNotBackground]
 var CharacterSprite =
 {
-    'green-character' : [[100, 100], '.gif', true]
+    'green-character' : [[100, 100], '.gif', true],
+    'red-character'   : [[100,200], '.gif', true]
 }
-var characterID = Object.keys(CharacterSprite)[0];
 
-addImage(characterID, CharacterSprite[characterID][0][0], CharacterSprite[characterID][0][1],  CharacterSprite[characterID][1],  CharacterSprite[characterID][2]);
+//Inserting in all Images
+for (let i =0; i< Object.keys(CharacterSprite).length; i++)
+{
+    let name = Object.keys(CharacterSprite)[i];
+    addImage(name, CharacterSprite[name][0][0],CharacterSprite[name][0][1], CharacterSprite[name][1], CharacterSprite[name][2] );
+}
 
 for (let i =0; i< Object.keys(settingImageObject).length; i++)
 {
@@ -257,7 +361,29 @@ for (let i =0; i< Object.keys(interactableImageObject).length; i++)
     addImage(name, interactableImageObject[name][0][0],interactableImageObject[name][0][1], interactableImageObject[name][1], interactableImageObject[name][2]);
     pickupItem(name);
 }
+
+//Adding in User Sprite's Arrow functionality
 const character = document.getElementById('green-character');
 move(character).withArrowKeys(100, 250, handleDirectionChange);
-alert('press e to open the inventory, and double click to pickup or drop items.');
 
+
+//Part 5: Adding in the NPC's looping movement
+var NPC = document.getElementById('red-character');
+NPC = newNonPlayableCharacter(700,120,1);
+function NPCLoop()
+{
+     NPC.walkNorth(3400)
+        .then(() => NPC.walkEast(1200))
+        .then(() => NPC.walkSouth(300))
+        .then(() => NPC.walkEast(500))
+        .then(() => NPC.walkSouth(4500))
+        .then(() => NPC.walkWest(2700))
+        .then(() => NPC.walkNorth(400))
+        .then(() => NPCLoop())
+}
+NPCLoop();
+
+
+//Just for now: indicate how to open inventory
+//will have to add an await to the npc later to show full pathingworks
+//alert('press e to open the inventory, and double click to pickup or drop items.');
