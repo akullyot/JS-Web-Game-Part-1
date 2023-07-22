@@ -135,23 +135,35 @@ function move(element) {
         element.style.left = x + 'px'
         element.style.bottom = y + 'px'
         
-        function moveCharacter()
-        { 
-            if(direction === 'west'){
-                x-=1
+        function moveCharacter() {
+            if (direction === 'west') {
+                if (x > 0)
+                {
+                    x -= 1
+                }
             }
-            if(direction === 'north'){
-                y+=1
+            if (direction === 'north') {
+                if (y < skyToGroundSwitchLocation)
+                {
+                    y += 1
+                }
             }
-            if(direction === 'east'){
-                x+=1
+            if (direction === 'east') {
+                if (x < window.innerWidth) //TODO: there is a problem here im not sure what
+                {
+                    x += 1
+                }
             }
-            if(direction === 'south'){
-                y-=1
+            if (direction === 'south') {
+                if (y > 0)
+                {
+                    y -= 1
+                }
             }
             element.style.left = x + 'px'
             element.style.bottom = y + 'px'
         }
+    
         setInterval(moveCharacter, 1)
         document.addEventListener('keydown', function(e)
         {
@@ -215,12 +227,18 @@ function handleDirectionChange(direction){
         character.src = `assets/green-character/south.gif`
     }
 }
-//Purpose: Instantiate a promised, NPC Object and loop its walking
+//Purpose: Instantiate a async, NPC Object and loop its walking
 // Parametres: starting X and Y coordinate for the sprite, and the number of pixels it moves per move interval
 function newNonPlayableCharacter(x, y, speed) {
     let element = NPC
     element.style.zIndex = 1;
     let direction = null;
+    //added as our setTimeout equivalent for async/await
+    function sleep(time){
+        return new Promise(resolve => {
+            setTimeout(resolve, time)
+        })  
+    }    
     function moveCharacter() {
         if (direction === 'west') {
             if (x > 0)
@@ -251,51 +269,32 @@ function newNonPlayableCharacter(x, y, speed) {
     }
 
     setInterval(moveCharacter, 1)
-
-    function walkEast(time) {
-        return new Promise(resolve => {
-            direction = 'east'
-            element.src = `./assets/red-character/east.gif`
-            setTimeout(() => {
-                stop()
-                resolve()
-            }, time)
-        })
+    async function walkEast(time) {
+        direction = 'east'
+        element.src = `./assets/red-character/east.gif`
+        await sleep(time)
+        stop()
+    }
+    async function walkNorth(time) {
+        direction = 'north'
+        element.src = `./assets/red-character/north.gif`
+        await sleep(time)
+        stop()
     }
 
-    function walkNorth(time) {
-        return new Promise(resolve => {
-            direction = 'north'
-            element.src = `./assets/red-character/north.gif`
-            setTimeout(() => {
-                stop()
-                resolve() //returns a promise object for us
-            }, time)
-        })
+    async function walkWest(time) {
+        direction = 'west'
+        element.src = `./assets/red-character/west.gif`
+        await sleep(time)
+        stop()
     }
 
-    function walkWest(time) {
-        return new Promise(resolve => {
-            direction = 'west'
-            element.src = `./assets/red-character/west.gif`
-            setTimeout(() => {
-                stop()
-                resolve()
-            }, time)
-        })
+    async function walkSouth(time) {
+        direction = 'south'
+        element.src = `./assets/red-character/south.gif`
+        await sleep(time)
+        stop()
     }
-
-    function walkSouth(time) {
-        return new Promise(resolve => {
-            direction = 'south'
-            element.src = `./assets/red-character/south.gif`
-            setTimeout(() => {
-                stop()
-                resolve()
-            }, time)
-        })
-    }
-
     function stop() {
         direction = null
         element.src = `./assets/red-character/static.gif`
@@ -310,6 +309,10 @@ function newNonPlayableCharacter(x, y, speed) {
         stop: stop
     }
 }
+//Purpose: handle collisions using 2D circle collisions
+//Method: takes the center points of two circles ensuring the distance between the center points are less than the two radii added together
+//Arguments: NPC and Character
+
 
 //////////////////////////////////////////////////////////////Execution////////////////////////////////////////////////////////////
 
@@ -367,23 +370,21 @@ const character = document.getElementById('green-character');
 move(character).withArrowKeys(100, 250, handleDirectionChange);
 
 
-//Part 5: Adding in the NPC's looping movement
+//Adding in the NPC's looping movement
 var NPC = document.getElementById('red-character');
 NPC = newNonPlayableCharacter(700,120,1);
-function NPCLoop()
+async function moveNPC()
 {
-     NPC.walkNorth(3400)
-        .then(() => NPC.walkEast(1200))
-        .then(() => NPC.walkSouth(300))
-        .then(() => NPC.walkEast(500))
-        .then(() => NPC.walkSouth(4500))
-        .then(() => NPC.walkWest(2700))
-        .then(() => NPC.walkNorth(400))
-        .then(() => NPCLoop())
+        await NPC.walkNorth(1400);
+        await NPC.walkEast(1200);
+        await NPC.walkSouth(300);
+        await NPC.walkEast(1500);
+        await NPC.walkSouth(1500);
+        await NPC.walkWest(2700);
+        await NPC.walkNorth(400);
+        await moveNPC();
 }
-NPCLoop();
+moveNPC();
 
 
-//Just for now: indicate how to open inventory
-//will have to add an await to the npc later to show full pathingworks
-//alert('press e to open the inventory, and double click to pickup or drop items.');
+alert('press e to open the inventory, and double click to pickup or drop items.');
